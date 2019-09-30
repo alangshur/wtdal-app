@@ -29,10 +29,47 @@ def build_adapter_sockets() -> tuple:
         return False, None, None, None
 
 class IngestionSocketFunctions:
-    pass
+    INGESTION_SOCKET_BYTES = 16
+
+    CONTRIBUTION_CODE_INT = 1
+    UPDATE_CODE_INT = 2
+    REMOVE_CODE_INT = 3
+
+    @staticmethod
+    def send_contribution_packet(ingestion_socket, contribution_id) -> None:
+        
+        # send request
+        request = struct.pack('iifi', IngestionSocketFunctions.CONTRIBUTION_CODE_INT, 
+            contribution_id, 0, 0)
+        ingestion_socket.sendall(request)
+
+        # receive response
+        response = ingestion_socket.recv(IngestionSocketFunctions.INGESTION_SOCKET_BYTES)
+        if struct.unpack('')
+
+    @staticmethod
+    def send_update_packet(ingestion_socket) -> None:
+        pass
+
+    @staticmethod
+    def send_remove_packet(ingestion_socket) -> None:
+        pass
 
 class MatchSocketFunctions:
-    pass
+    MATCH_SOCKET_BYTES = 12
+
+    @staticmethod
+    def send_match_packet(match_socket) -> tuple:
+
+        # send request
+        request = struct.pack('iii', PACKET_DIR_ACK_INT, 0, 0)
+        match_socket.sendall(request)
+
+        # receive response
+        response = match_socket.recv(MatchSocketFunctions.MATCH_SOCKET_BYTES)
+        struct_resp = struct.unpack('iII', response)
+        if struct_resp[0] == 2: return None
+        else: return (struct_resp[1], struct_resp[2])
 
 class ControlSocketFunctions:
     CONTROL_SOCKET_BYTES = 8
@@ -63,7 +100,10 @@ class ControlSocketFunctions:
 
         # receive response
         response = control_socket.recv(ControlSocketFunctions.CONTROL_SOCKET_BYTES)
-        return struct.unpack('ii', response)
+        struct_resp = struct.unpack('ii', response)
+        if not struct_resp[0]: return None
+        elif struct_resp[0] == 1: return ('below', struct_resp[1])
+        elif struct_resp[0] == 2: return ('above', struct_resp[1])
 
     @staticmethod
     def send_alive_packet(control_socket) -> None:
